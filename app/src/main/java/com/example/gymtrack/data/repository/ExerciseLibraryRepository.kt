@@ -1,4 +1,4 @@
-package com.example.gymtrack.repository
+package com.example.gymtrack.data.repository
 
 import androidx.lifecycle.LiveData
 import com.example.gymtrack.data.db.ExerciseLibraryDao
