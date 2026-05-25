@@ -10,6 +10,8 @@ import com.example.gymtrack.data.db.ExerciseEntity
 import com.example.gymtrack.data.db.SetEntity
 import com.example.gymtrack.data.db.WorkoutEntity
 import com.example.gymtrack.data.repository.WorkoutRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -69,13 +71,33 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         )
         val id = repository.insertWorkout(workout)
         _activeWorkoutId.postValue(id)
+        startTimer()
     }
 
     fun finishWorkout() {
         _activeWorkoutId.value = null
+        stopTimer()
     }
 
     suspend fun getTotalVolume(workoutId: Long): Float? {
         return repository.getTotalVolume(workoutId)
+    }
+
+    private val _timerSeconds = MutableLiveData(0)
+    val timerSeconds: LiveData<Int> = _timerSeconds
+    private var timerJob: Job? = null
+
+    fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                _timerSeconds.postValue((_timerSeconds.value ?: 0) + 1)
+            }
+        }
+    }
+
+    fun stopTimer() {
+        timerJob?.cancel()
+        _timerSeconds.value = 0
     }
 }

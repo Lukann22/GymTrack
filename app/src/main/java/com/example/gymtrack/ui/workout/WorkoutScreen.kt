@@ -93,6 +93,7 @@ fun ActiveWorkoutScreen(
 ) {
     val exercises by workoutViewModel.getExercisesForWorkout(workoutId).observeAsState(emptyList())
     var showAddExerciseDialog by remember { mutableStateOf(false) }
+    val timerSeconds by workoutViewModel.timerSeconds.observeAsState(0)
 
     Column(
         modifier = Modifier
@@ -113,6 +114,11 @@ fun ActiveWorkoutScreen(
                     color = textPrimary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "⏱ ${String.format("%02d:%02d", timerSeconds / 60, timerSeconds % 60)}",
+                    color = textSecondary,
+                    fontSize = 14.sp
                 )
             }
 
