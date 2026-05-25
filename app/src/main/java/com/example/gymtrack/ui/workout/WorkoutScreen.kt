@@ -1,5 +1,7 @@
 package com.example.gymtrack.ui.workout
 
+import androidx.compose.ui.res.stringResource
+import com.example.gymtrack.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,129 +31,64 @@ fun WorkoutScreen(
     val activeWorkoutId by workoutViewModel.activeWorkoutId.observeAsState()
 
     if (activeWorkoutId == null) {
-        NoActiveWorkoutScreen(
-            onStartWorkout = {
-                workoutViewModel.startWorkout("My Workout")
-            }
-        )
+        NoActiveWorkoutScreen(onStartWorkout = { workoutViewModel.startWorkout("My Workout") })
     } else {
-        ActiveWorkoutScreen(
-            workoutId = activeWorkoutId!!,
-            workoutViewModel = workoutViewModel
-        )
+        ActiveWorkoutScreen(workoutId = activeWorkoutId!!, workoutViewModel = workoutViewModel)
     }
 }
 
 @Composable
 fun NoActiveWorkoutScreen(onStartWorkout: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(20.dp),
+        modifier = Modifier.fillMaxSize().background(backgroundColor).padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "No active workout",
-            color = textPrimary,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-
+        Text(text = stringResource(R.string.no_active_workout), color = textPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Start a workout to begin tracking",
-            color = textSecondary,
-            fontSize = 14.sp
-        )
-
+        Text(text = stringResource(R.string.start_workout_desc), color = textSecondary, fontSize = 14.sp)
         Spacer(modifier = Modifier.height(24.dp))
-
         Button(
             onClick = onStartWorkout,
             colors = ButtonDefaults.buttonColors(containerColor = greenColor),
             shape = RoundedCornerShape(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
+            modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
-            Text(
-                text = "▶  Start Workout",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = stringResource(R.string.start_workout), color = Color.Black, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
-fun ActiveWorkoutScreen(
-    workoutId: Long,
-    workoutViewModel: WorkoutViewModel
-) {
+fun ActiveWorkoutScreen(workoutId: Long, workoutViewModel: WorkoutViewModel) {
     val exercises by workoutViewModel.getExercisesForWorkout(workoutId).observeAsState(emptyList())
     var showAddExerciseDialog by remember { mutableStateOf(false) }
     val timerSeconds by workoutViewModel.timerSeconds.observeAsState(0)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor)
-            .padding(20.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxSize().background(backgroundColor).padding(20.dp)) {
         Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column {
-                Text(
-                    text = "Active Workout",
-                    color = textPrimary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "⏱ ${String.format("%02d:%02d", timerSeconds / 60, timerSeconds % 60)}",
-                    color = textSecondary,
-                    fontSize = 14.sp
-                )
+                Text(text = stringResource(R.string.active_workout), color = textPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = "⏱ ${String.format("%02d:%02d", timerSeconds / 60, timerSeconds % 60)}", color = textSecondary, fontSize = 14.sp)
             }
-
-            Button(
-                onClick = { workoutViewModel.finishWorkout() },
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(text = "Finish", color = Color.Black, fontWeight = FontWeight.Bold)
+            Button(onClick = { workoutViewModel.finishWorkout() }, colors = ButtonDefaults.buttonColors(containerColor = greenColor), shape = RoundedCornerShape(8.dp)) {
+                Text(text = stringResource(R.string.finish), color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
         Button(
             onClick = { showAddExerciseDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = surfaceColor),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "+ Add Exercise", color = textPrimary, fontSize = 16.sp)
+            Text(text = stringResource(R.string.add_exercise), color = textPrimary, fontSize = 16.sp)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
         LazyColumn {
             items(exercises) { exercise ->
-                ExerciseCard(
-                    exercise = exercise,
-                    workoutViewModel = workoutViewModel
-                )
+                ExerciseCard(exercise = exercise, workoutViewModel = workoutViewModel)
                 Spacer(modifier = Modifier.height(12.dp))
             }
         }
@@ -159,12 +96,7 @@ fun ActiveWorkoutScreen(
             AddExerciseDialog(
                 onDismiss = { showAddExerciseDialog = false },
                 onConfirm = { name ->
-                    workoutViewModel.insertExercise(
-                        com.example.gymtrack.data.db.ExerciseEntity(
-                            name = name,
-                            workoutId = workoutId
-                        )
-                    )
+                    workoutViewModel.insertExercise(com.example.gymtrack.data.db.ExerciseEntity(name = name, workoutId = workoutId))
                     showAddExerciseDialog = false
                 }
             )
@@ -173,83 +105,44 @@ fun ActiveWorkoutScreen(
 }
 
 @Composable
-fun AddExerciseDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
-) {
+fun AddExerciseDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     var exerciseName by remember { mutableStateOf("") }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = surfaceColor,
-        title = {
-            Text(text = "Add Exercise", color = textPrimary, fontWeight = FontWeight.Bold)
-        },
+        title = { Text(text = stringResource(R.string.add_exercise_title), color = textPrimary, fontWeight = FontWeight.Bold) },
         text = {
             OutlinedTextField(
                 value = exerciseName,
                 onValueChange = { exerciseName = it },
-                label = { Text("Exercise name", color = textSecondary) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = textPrimary,
-                    unfocusedTextColor = textPrimary,
-                    focusedBorderColor = greenColor,
-                    unfocusedBorderColor = textSecondary
-                )
+                label = { Text(stringResource(R.string.exercise_name_hint), color = textSecondary) },
+                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = textPrimary, unfocusedTextColor = textPrimary, focusedBorderColor = greenColor, unfocusedBorderColor = textSecondary)
             )
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    if (exerciseName.isNotBlank()) {
-                        onConfirm(exerciseName)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-            ) {
-                Text("Add", color = Color.Black)
+            Button(onClick = { if (exerciseName.isNotBlank()) onConfirm(exerciseName) }, colors = ButtonDefaults.buttonColors(containerColor = greenColor)) {
+                Text(stringResource(R.string.add), color = Color.Black)
             }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = textSecondary)
-            }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = textSecondary) } }
     )
 }
 
-
 @Composable
-fun ExerciseCard(
-    exercise: com.example.gymtrack.data.db.ExerciseEntity,
-    workoutViewModel: WorkoutViewModel
-) {
+fun ExerciseCard(exercise: com.example.gymtrack.data.db.ExerciseEntity, workoutViewModel: WorkoutViewModel) {
     val sets by workoutViewModel.getSetsForExercise(exercise.id).observeAsState(emptyList())
     var showAddSetDialog by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        shape = RoundedCornerShape(12.dp)
-    ) {
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = surfaceColor), shape = RoundedCornerShape(12.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = exercise.name,
-                color = textPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-
+            Text(text = exercise.name, color = textPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-
             Row(modifier = Modifier.fillMaxWidth()) {
-                Text("SET", color = textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                Text("KG", color = textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
-                Text("REPS", color = textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.set_label), color = textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.kg_label), color = textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.reps_label), color = textSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
             }
-
             Spacer(modifier = Modifier.height(4.dp))
-
             sets.forEachIndexed { index, set ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                     Text("${index + 1}", color = textPrimary, modifier = Modifier.weight(1f))
@@ -257,11 +150,9 @@ fun ExerciseCard(
                     Text("${set.reps}", color = textPrimary, modifier = Modifier.weight(1f))
                 }
             }
-
             Spacer(modifier = Modifier.height(8.dp))
-
             TextButton(onClick = { showAddSetDialog = true }) {
-                Text("+ Add Set", color = greenColor)
+                Text(stringResource(R.string.add_set), color = greenColor)
             }
         }
     }
@@ -270,13 +161,7 @@ fun ExerciseCard(
         AddSetDialog(
             onDismiss = { showAddSetDialog = false },
             onConfirm = { weight, reps ->
-                workoutViewModel.insertSet(
-                    com.example.gymtrack.data.db.SetEntity(
-                        weight = weight,
-                        reps = reps,
-                        exerciseId = exercise.id
-                    )
-                )
+                workoutViewModel.insertSet(com.example.gymtrack.data.db.SetEntity(weight = weight, reps = reps, exerciseId = exercise.id))
                 showAddSetDialog = false
             }
         )
@@ -284,64 +169,28 @@ fun ExerciseCard(
 }
 
 @Composable
-fun AddSetDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (Float, Int) -> Unit
-) {
+fun AddSetDialog(onDismiss: () -> Unit, onConfirm: (Float, Int) -> Unit) {
     var weight by remember { mutableStateOf("") }
     var reps by remember { mutableStateOf("") }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = surfaceColor,
-        title = {
-            Text("Add Set", color = textPrimary, fontWeight = FontWeight.Bold)
-        },
+        title = { Text(stringResource(R.string.add_set_title), color = textPrimary, fontWeight = FontWeight.Bold) },
         text = {
             Column {
-                OutlinedTextField(
-                    value = weight,
-                    onValueChange = { weight = it },
-                    label = { Text("Weight (kg)", color = textSecondary) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = textPrimary,
-                        unfocusedTextColor = textPrimary,
-                        focusedBorderColor = greenColor,
-                        unfocusedBorderColor = textSecondary
-                    )
-                )
+                OutlinedTextField(value = weight, onValueChange = { weight = it }, label = { Text(stringResource(R.string.weight_hint), color = textSecondary) },
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = textPrimary, unfocusedTextColor = textPrimary, focusedBorderColor = greenColor, unfocusedBorderColor = textSecondary))
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = reps,
-                    onValueChange = { reps = it },
-                    label = { Text("Reps", color = textSecondary) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = textPrimary,
-                        unfocusedTextColor = textPrimary,
-                        focusedBorderColor = greenColor,
-                        unfocusedBorderColor = textSecondary
-                    )
-                )
+                OutlinedTextField(value = reps, onValueChange = { reps = it }, label = { Text(stringResource(R.string.reps_hint), color = textSecondary) },
+                    colors = OutlinedTextFieldDefaults.colors(focusedTextColor = textPrimary, unfocusedTextColor = textPrimary, focusedBorderColor = greenColor, unfocusedBorderColor = textSecondary))
             }
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    val w = weight.toFloatOrNull()
-                    val r = reps.toIntOrNull()
-                    if (w != null && r != null) {
-                        onConfirm(w, r)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-            ) {
-                Text("Add", color = Color.Black)
+            Button(onClick = { val w = weight.toFloatOrNull(); val r = reps.toIntOrNull(); if (w != null && r != null) onConfirm(w, r) },
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor)) {
+                Text(stringResource(R.string.add), color = Color.Black)
             }
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = textSecondary)
-            }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = textSecondary) } }
     )
 }
