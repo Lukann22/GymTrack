@@ -17,4 +17,7 @@ interface WorkoutDao {
 
     @Delete
     suspend fun deleteWorkout(workout: WorkoutEntity)
+
+    @Query("SELECT SUM(s.weight * s.reps) FROM sets s INNER JOIN exercises e ON s.exerciseId = e.id WHERE e.workoutId = :workoutId")
+    suspend fun getTotalVolume(workoutId: Long): Float?
 }

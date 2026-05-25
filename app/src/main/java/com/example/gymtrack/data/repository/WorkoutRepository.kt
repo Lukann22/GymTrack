@@ -47,4 +47,8 @@ class WorkoutRepository(
     suspend fun deleteSet(set: SetEntity) {
         setDao.deleteSet(set)
     }
+
+    suspend fun getTotalVolume(workoutId: Long): Float? {
+        return workoutDao.getTotalVolume(workoutId)
+    }
 }
