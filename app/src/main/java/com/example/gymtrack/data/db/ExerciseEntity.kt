@@ -4,6 +4,11 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
+/**
+ * Entity representing an exercise within a workout session.
+ * Each exercise belongs to a specific workout via workoutId foreign key.
+ * Cascade delete ensures exercises are removed when workout is deleted.
+ */
 @Entity(
     tableName = "exercises",
     foreignKeys = [ForeignKey(

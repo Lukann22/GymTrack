@@ -3,7 +3,10 @@ package com.example.gymtrack.data.repository
 import androidx.lifecycle.LiveData
 import com.example.gymtrack.data.db.ExerciseLibraryDao
 import com.example.gymtrack.data.db.ExerciseLibraryEntity
-
+/**
+ * Repository for exercise library operations.
+ * Provides access to the global exercise library stored in Room database.
+ */
 class ExerciseLibraryRepository(
     private val exerciseLibraryDao: ExerciseLibraryDao
 ) {

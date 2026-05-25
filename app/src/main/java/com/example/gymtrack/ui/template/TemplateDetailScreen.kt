@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,7 +25,11 @@ import com.example.gymtrack.ui.home.surfaceColor
 import com.example.gymtrack.ui.home.textPrimary
 import com.example.gymtrack.ui.home.textSecondary
 import com.example.gymtrack.ui.viewmodel.ExerciseLibraryViewModel
-
+/**
+ * Detail screen for a workout template showing its exercises.
+ * Allows adding exercises to the global library and starting
+ * a workout session with the template's exercises.
+ */
 @Composable
 fun TemplateDetailScreen(
     templateId: Long,
@@ -34,7 +39,7 @@ fun TemplateDetailScreen(
     exerciseLibraryViewModel: ExerciseLibraryViewModel = viewModel()
 ) {
     val exercises by exerciseLibraryViewModel.allExercises.observeAsState(emptyList())
-    var showAddExerciseDialog by remember { mutableStateOf(false) }
+    var showAddExerciseDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -110,7 +115,10 @@ fun TemplateDetailScreen(
         }
     }
 }
-
+/**
+ * Card component displaying a single exercise from the library.
+ * Shows exercise name and target muscle group.
+ */
 @Composable
 fun ExerciseLibraryCard(exercise: ExerciseLibraryEntity) {
     Card(
@@ -131,14 +139,17 @@ fun ExerciseLibraryCard(exercise: ExerciseLibraryEntity) {
         }
     }
 }
-
+/**
+ * Dialog for adding a new exercise to the global exercise library.
+ * Requires both exercise name and muscle group to be filled in.
+ */
 @Composable
 fun AddLibraryExerciseDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, String) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var muscleGroup by remember { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var muscleGroup by rememberSaveable { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,

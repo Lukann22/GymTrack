@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +31,10 @@ val surfaceColor = Color(0xFF1A1A1A)
 val greenColor = Color(0xFF4ADE80)
 val textPrimary = Color(0xFFFFFFFF)
 val textSecondary = Color(0xFF9CA3AF)
-
+/**
+ * Main home screen composable showing quick start templates and workout button.
+ * Displays list of user-created workout templates for quick access.
+ */
 @Composable
 fun HomeScreen(
     templateViewModel: WorkoutTemplateViewModel = viewModel(),
@@ -40,7 +44,7 @@ fun HomeScreen(
 
 ) {
     val templates by templateViewModel.allTemplates.observeAsState(emptyList())
-    var showAddTemplateDialog by remember { mutableStateOf(false) }
+    var showAddTemplateDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -122,7 +126,10 @@ fun HomeScreen(
         }
     }
 }
-
+/**
+ * Card component displaying a single workout template.
+ * Shows template name, exercise count and navigates to template detail on click.
+ */
 @Composable
 fun TemplateCard(template: WorkoutTemplateEntity,onTemplateClick: (Long, String) -> Unit) {
     Card(
@@ -156,12 +163,16 @@ fun TemplateCard(template: WorkoutTemplateEntity,onTemplateClick: (Long, String)
     }
 }
 
+/**
+ * Dialog for creating a new workout template/routine.
+ * Validates input before confirming to prevent empty template names.
+ */
 @Composable
 fun AddTemplateDialog(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit
 ) {
-    var templateName by remember { mutableStateOf("") }
+    var templateName by rememberSaveable { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,

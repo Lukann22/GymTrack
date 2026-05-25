@@ -5,7 +5,12 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-
+/**
+ * Data Access Object for workout operations.
+ * Provides methods to insert, query and delete workouts from Room database.
+ * getAllWorkouts() returns LiveData for automatic UI updates.
+ * getTotalVolume() calculates total weight lifted in a workout session.
+ */
 @Dao
 interface WorkoutDao {
 

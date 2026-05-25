@@ -2,7 +2,12 @@ package com.example.gymtrack.data.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-
+/**
+ * Data Access Object for exercise library operations.
+ * The exercise library is a global collection of exercises
+ * independent of any specific workout session.
+ * Supports filtering by muscle group for better organization.
+ */
 @Dao
 interface ExerciseLibraryDao {
 
