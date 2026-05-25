@@ -1,5 +1,7 @@
 package com.example.gymtrack.ui.history
 
+import androidx.compose.ui.res.stringResource
+import com.example.gymtrack.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -44,14 +46,14 @@ fun HistoryScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "History",
+            text = stringResource(R.string.history),
             color = textPrimary,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = "Your past workouts",
+            text = stringResource(R.string.your_past_workouts),
             color = textSecondary,
             fontSize = 14.sp
         )
@@ -64,7 +66,7 @@ fun HistoryScreen(
                 contentAlignment = androidx.compose.ui.Alignment.Center
             ) {
                 Text(
-                    text = "No workouts yet",
+                    text = stringResource(R.string.no_workouts),
                     color = textSecondary,
                     fontSize = 16.sp
                 )

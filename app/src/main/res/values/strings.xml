@@ -1,13 +1,32 @@
 <resources>
     <string name="app_name">GymTrack</string>
-    <string name="history">History</string>
-    <string name="your_past_workouts">Your past workouts</string>
-    <string name="gymtrack">GymTrack</string>
-    <string name="ready_to_crush_it">Ready to crush it?</string>
+    <string name="ready_to_crush">Ready to crush it?</string>
+    <string name="start_empty_workout">▶  Start Empty Workout</string>
     <string name="quick_start">Quick Start</string>
-    <string name="start_empty_workout">Start Empty Workout</string>
+    <string name="exercises_count">%d exercises</string>
     <string name="active_workout">Active Workout</string>
-    <string name="_00_00">⏱ 00:00</string>
     <string name="finish">Finish</string>
     <string name="add_exercise">+ Add Exercise</string>
+    <string name="add_exercise_title">Add Exercise</string>
+    <string name="exercise_name_hint">Exercise name</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_set">+ Add Set</string>
+    <string name="add_set_title">Add Set</string>
+    <string name="weight_hint">Weight (kg)</string>
+    <string name="reps_hint">Reps</string>
+    <string name="history">History</string>
+    <string name="your_past_workouts">Your past workouts</string>
+    <string name="no_workouts">No workouts yet</string>
+    <string name="no_active_workout">No active workout</string>
+    <string name="start_workout_desc">Start a workout to begin tracking</string>
+    <string name="start_workout">▶  Start Workout</string>
+    <string name="set_label">SET</string>
+    <string name="kg_label">KG</string>
+    <string name="reps_label">REPS</string>
+
+    <string name="start">Start</string>
+    <string name="done">Done</string>
+    <string name="routine_name_hint">Routine name</string>
+    <string name="new_routine">New Routine</string>
 </resources>

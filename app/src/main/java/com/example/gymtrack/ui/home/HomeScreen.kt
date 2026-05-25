@@ -1,6 +1,8 @@
 package com.example.gymtrack.ui.home
 
+import com.example.gymtrack.R
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,9 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,9 +33,14 @@ val textSecondary = Color(0xFF9CA3AF)
 
 @Composable
 fun HomeScreen(
-    templateViewModel: WorkoutTemplateViewModel = viewModel()
+    templateViewModel: WorkoutTemplateViewModel = viewModel(),
+    onStartWorkout: () -> Unit = {},
+    onTemplateClick: (Long, String) -> Unit = { _, _ -> }
+
+
 ) {
     val templates by templateViewModel.allTemplates.observeAsState(emptyList())
+    var showAddTemplateDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -40,14 +51,14 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "GymTrack",
+            text = stringResource(R.string.app_name),
             color = textPrimary,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold
         )
 
         Text(
-            text = "Ready to crush it?",
+            text = stringResource(R.string.ready_to_crush),
             color = textSecondary,
             fontSize = 14.sp
         )
@@ -55,7 +66,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = { },
+            onClick = onStartWorkout,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -63,7 +74,7 @@ fun HomeScreen(
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "▶  Start Empty Workout",
+                text = stringResource(R.string.start_empty_workout),
                 color = Color.Black,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -72,28 +83,51 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = "Quick Start",
-            color = textPrimary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.quick_start),
+                color = textPrimary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            TextButton(onClick = { showAddTemplateDialog = true }) {
+                Text("+ New", color = greenColor)
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
             items(templates) { template ->
-                TemplateCard(template = template)
+                TemplateCard(template = template,
+                    onTemplateClick = onTemplateClick)
                 Spacer(modifier = Modifier.height(12.dp))
             }
+        }
+
+        if (showAddTemplateDialog) {
+            AddTemplateDialog(
+                onDismiss = { showAddTemplateDialog = false },
+                onConfirm = { name ->
+                    templateViewModel.insertTemplate(
+                        com.example.gymtrack.data.db.WorkoutTemplateEntity(name = name)
+                    )
+                    showAddTemplateDialog = false
+                }
+            )
         }
     }
 }
 
 @Composable
-fun TemplateCard(template: WorkoutTemplateEntity) {
+fun TemplateCard(template: WorkoutTemplateEntity,onTemplateClick: (Long, String) -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable { onTemplateClick(template.id, template.name) },
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -112,7 +146,7 @@ fun TemplateCard(template: WorkoutTemplateEntity) {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "${template.exerciseCount} exercises",
+                    text = stringResource(R.string.exercises_count, template.exerciseCount),
                     color = textSecondary,
                     fontSize = 14.sp
                 )
@@ -120,4 +154,44 @@ fun TemplateCard(template: WorkoutTemplateEntity) {
             Text(text = "💪", fontSize = 24.sp)
         }
     }
+}
+
+@Composable
+fun AddTemplateDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var templateName by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = surfaceColor,
+        title = { Text("New Routine", color = textPrimary, fontWeight = FontWeight.Bold) },
+        text = {
+            OutlinedTextField(
+                value = templateName,
+                onValueChange = { templateName = it },
+                label = { Text("Routine name", color = textSecondary) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = textPrimary,
+                    unfocusedTextColor = textPrimary,
+                    focusedBorderColor = greenColor,
+                    unfocusedBorderColor = textSecondary
+                )
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = { if (templateName.isNotBlank()) onConfirm(templateName) },
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+            ) {
+                Text("Add", color = Color.Black)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = textSecondary)
+            }
+        }
+    )
 }

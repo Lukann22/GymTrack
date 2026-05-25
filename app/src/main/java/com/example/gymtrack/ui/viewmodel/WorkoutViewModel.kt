@@ -100,4 +100,13 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         timerJob?.cancel()
         _timerSeconds.value = 0
     }
+    fun startWorkoutFromTemplate(name: String, exerciseNames: List<String>) = viewModelScope.launch {
+        val workout = WorkoutEntity(name = name, date = Date().time)
+        val id = repository.insertWorkout(workout)
+        exerciseNames.forEach { exerciseName ->
+            repository.insertExercise(ExerciseEntity(name = exerciseName, workoutId = id))
+        }
+        _activeWorkoutId.postValue(id)
+        startTimer()
+    }
 }

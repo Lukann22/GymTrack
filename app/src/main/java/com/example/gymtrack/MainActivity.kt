@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -17,6 +18,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.gymtrack.ui.history.HistoryScreen
 import com.example.gymtrack.ui.home.HomeScreen
+import com.example.gymtrack.ui.template.TemplateDetailScreen
+import com.example.gymtrack.ui.viewmodel.WorkoutViewModel
 import com.example.gymtrack.ui.workout.WorkoutScreen
 
 class MainActivity : ComponentActivity() {
@@ -31,6 +34,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GymTrackApp() {
     val navController = rememberNavController()
+    val workoutViewModel: WorkoutViewModel = viewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -51,11 +55,8 @@ fun GymTrackApp() {
                         selected = currentDestination?.hierarchy?.any { it.route == route } == true,
                         onClick = {
                             navController.navigate(route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
+                                popUpTo("home")
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         icon = { Text(icon) },
@@ -77,9 +78,31 @@ fun GymTrackApp() {
             startDestination = "home",
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable("home") { HomeScreen() }
-            composable("workout") { WorkoutScreen() }
+            composable("workout") { WorkoutScreen(workoutViewModel = workoutViewModel) }
+            composable("home") {
+                HomeScreen(
+                    onStartWorkout = { navController.navigate("workout") { launchSingleTop = true } },
+                    onTemplateClick = { id, name -> navController.navigate("template/$id/$name") }
+                )
+            }
+
             composable("history") { HistoryScreen() }
+            composable("template/{templateId}/{templateName}") { backStackEntry ->
+                val templateId = backStackEntry.arguments?.getString("templateId")?.toLong() ?: 0L
+                val templateName = backStackEntry.arguments?.getString("templateName") ?: ""
+                TemplateDetailScreen(
+                    templateId = templateId,
+                    templateName = templateName,
+                    onBack = { navController.popBackStack() },
+                    onStartWorkout = { name, exercises ->
+                        workoutViewModel.startWorkoutFromTemplate(name, exercises)
+                        navController.navigate("workout") {
+                            popUpTo("home")
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
         }
     }
 }
