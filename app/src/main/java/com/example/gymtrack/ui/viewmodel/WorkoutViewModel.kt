@@ -1,10 +1,12 @@
 package com.example.gymtrack.ui.viewmodel
 
+import android.content.Context
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.gymtrack.NotificationHelper
 import com.example.gymtrack.data.db.GymTrackDatabase
 import com.example.gymtrack.data.db.ExerciseEntity
 import com.example.gymtrack.data.db.SetEntity
@@ -14,7 +16,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
-
+/**
+ * ViewModel for managing workout data and UI state.
+ * Handles active workout session, timer, exercises and sets.
+ * Communicates with WorkoutRepository for data operations.
+ */
 class WorkoutViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: WorkoutRepository
@@ -74,9 +80,11 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         startTimer()
     }
 
-    fun finishWorkout() {
+    fun finishWorkout(context: Context) {
         _activeWorkoutId.value = null
         stopTimer()
+        NotificationHelper.showWorkoutCompleteNotification(context)
+
     }
 
     suspend fun getTotalVolume(workoutId: Long): Float? {

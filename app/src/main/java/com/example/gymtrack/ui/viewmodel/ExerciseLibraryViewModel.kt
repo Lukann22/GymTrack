@@ -8,7 +8,10 @@ import com.example.gymtrack.data.db.ExerciseLibraryEntity
 import com.example.gymtrack.data.db.GymTrackDatabase
 import com.example.gymtrack.data.repository.ExerciseLibraryRepository
 import kotlinx.coroutines.launch
-
+/**
+ * ViewModel for managing exercise library data.
+ * Provides access to all exercises and muscle group filtering.
+ */
 class ExerciseLibraryViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: ExerciseLibraryRepository

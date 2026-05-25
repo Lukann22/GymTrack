@@ -2,7 +2,11 @@ package com.example.gymtrack.data.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-
+/**
+ * Data Access Object for set operations within an exercise.
+ * Sets are the most granular data unit in GymTrack - each set
+ * stores weight and reps for a specific exercise in a workout.
+ */
 @Dao
 interface SetDao {
 

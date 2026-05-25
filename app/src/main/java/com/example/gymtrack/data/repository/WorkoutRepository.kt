@@ -7,7 +7,11 @@ import com.example.gymtrack.data.db.WorkoutDao
 import com.example.gymtrack.data.db.WorkoutEntity
 import com.example.gymtrack.data.db.SetDao
 import com.example.gymtrack.data.db.SetEntity
-
+/**
+ * Repository for workout data operations.
+ * Acts as a single source of truth between ViewModel and Room database.
+ * Handles WorkoutEntity, ExerciseEntity and SetEntity operations.
+ */
 class WorkoutRepository(
     private val workoutDao: WorkoutDao,
     private val exerciseDao: ExerciseDao,

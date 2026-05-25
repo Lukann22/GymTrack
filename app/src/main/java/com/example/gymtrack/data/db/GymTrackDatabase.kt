@@ -6,7 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-
+/**
+ * Main Room database for GymTrack application.
+ * Contains all entities and provides DAO access.
+ * Implemented as a singleton to prevent multiple instances.
+ */
 @Database(
     entities = [
         WorkoutEntity::class,

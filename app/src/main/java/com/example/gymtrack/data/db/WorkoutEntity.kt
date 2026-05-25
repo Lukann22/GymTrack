@@ -3,6 +3,10 @@ package com.example.gymtrack.data.db
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ * Entity representing a workout session in the database.
+ * Contains the workout name and date when it was performed.
+ */
 @Entity(tableName = "workouts")
 data class WorkoutEntity(
     @PrimaryKey(autoGenerate = true)

@@ -30,7 +30,11 @@ import com.example.gymtrack.ui.home.textSecondary
 import com.example.gymtrack.ui.viewmodel.WorkoutViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-
+/**
+ * History screen showing all past workout sessions.
+ * Displays workouts in reverse chronological order.
+ * Shows empty state when no workouts have been completed yet.
+ */
 @Composable
 fun HistoryScreen(
     workoutViewModel: WorkoutViewModel = viewModel()
@@ -81,7 +85,11 @@ fun HistoryScreen(
         }
     }
 }
-
+/**
+ * Card component displaying a single past workout.
+ * Shows workout name, date and total volume lifted in kilograms.
+ * Total volume is calculated as sum of (weight * reps) for all sets.
+ */
 @Composable
 fun WorkoutHistoryCard(
     workout: WorkoutEntity,

@@ -1,5 +1,7 @@
 package com.example.gymtrack
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,26 +13,53 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.gymtrack.ui.history.HistoryScreen
 import com.example.gymtrack.ui.home.HomeScreen
 import com.example.gymtrack.ui.template.TemplateDetailScreen
 import com.example.gymtrack.ui.viewmodel.WorkoutViewModel
 import com.example.gymtrack.ui.workout.WorkoutScreen
-
+import java.util.concurrent.TimeUnit
+/**
+ * Main entry point of the GymTrack application.
+ * Initializes notification channel and WorkManager daily reminder.
+ * Sets up Jetpack Compose UI with navigation.
+ */
 class MainActivity : ComponentActivity() {
+    /**
+     * Called when the activity is first created.
+     * Sets up notification channel, WorkManager reminder and Compose UI.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
+        val reminderRequest = PeriodicWorkRequestBuilder<ReminderWorker>(1, TimeUnit.MINUTES)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "daily_reminder",
+            ExistingPeriodicWorkPolicy.KEEP,
+            reminderRequest
+        )
         super.onCreate(savedInstanceState)
+        NotificationHelper.createNotificationChannel(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+        }
         setContent {
             GymTrackApp()
         }
     }
 }
-
+/**
+ * Root composable function that sets up the entire app navigation.
+ * Contains bottom navigation bar with Home, Workout and History tabs.
+ * Manages navigation between all screens using NavController.
+ */
 @Composable
 fun GymTrackApp() {
     val navController = rememberNavController()
@@ -105,4 +134,5 @@ fun GymTrackApp() {
             }
         }
     }
+
 }

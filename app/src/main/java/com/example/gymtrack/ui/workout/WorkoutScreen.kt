@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,13 +18,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.gymtrack.NotificationHelper
 import com.example.gymtrack.ui.home.backgroundColor
 import com.example.gymtrack.ui.home.greenColor
 import com.example.gymtrack.ui.home.surfaceColor
 import com.example.gymtrack.ui.home.textPrimary
 import com.example.gymtrack.ui.home.textSecondary
 import com.example.gymtrack.ui.viewmodel.WorkoutViewModel
-
+/**
+ * Main workout screen that switches between active and inactive states.
+ * Shows NoActiveWorkoutScreen when no workout is running,
+ * ActiveWorkoutScreen when a workout session is in progress.
+ */
 @Composable
 fun WorkoutScreen(
     workoutViewModel: WorkoutViewModel = viewModel()
@@ -36,7 +42,10 @@ fun WorkoutScreen(
         ActiveWorkoutScreen(workoutId = activeWorkoutId!!, workoutViewModel = workoutViewModel)
     }
 }
-
+/**
+ * Screen shown when no workout is currently active.
+ * Provides button to start a new empty workout session.
+ */
 @Composable
 fun NoActiveWorkoutScreen(onStartWorkout: () -> Unit) {
     Column(
@@ -58,12 +67,16 @@ fun NoActiveWorkoutScreen(onStartWorkout: () -> Unit) {
         }
     }
 }
-
+/**
+ * Screen shown during an active workout session.
+ * Displays timer, exercise list and allows adding exercises and sets.
+ */
 @Composable
 fun ActiveWorkoutScreen(workoutId: Long, workoutViewModel: WorkoutViewModel) {
     val exercises by workoutViewModel.getExercisesForWorkout(workoutId).observeAsState(emptyList())
-    var showAddExerciseDialog by remember { mutableStateOf(false) }
+    var showAddExerciseDialog by rememberSaveable { mutableStateOf(false) }
     val timerSeconds by workoutViewModel.timerSeconds.observeAsState(0)
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(modifier = Modifier.fillMaxSize().background(backgroundColor).padding(20.dp)) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -72,7 +85,7 @@ fun ActiveWorkoutScreen(workoutId: Long, workoutViewModel: WorkoutViewModel) {
                 Text(text = stringResource(R.string.active_workout), color = textPrimary, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Text(text = "⏱ ${String.format("%02d:%02d", timerSeconds / 60, timerSeconds % 60)}", color = textSecondary, fontSize = 14.sp)
             }
-            Button(onClick = { workoutViewModel.finishWorkout() }, colors = ButtonDefaults.buttonColors(containerColor = greenColor), shape = RoundedCornerShape(8.dp)) {
+            Button(onClick = { workoutViewModel.finishWorkout(context) }, colors = ButtonDefaults.buttonColors(containerColor = greenColor), shape = RoundedCornerShape(8.dp)) {
                 Text(text = stringResource(R.string.finish), color = Color.Black, fontWeight = FontWeight.Bold)
             }
         }
@@ -103,10 +116,13 @@ fun ActiveWorkoutScreen(workoutId: Long, workoutViewModel: WorkoutViewModel) {
         }
     }
 }
-
+/**
+ * Dialog for adding a new exercise to the current workout.
+ * Validates that exercise name is not blank before confirming.
+ */
 @Composable
 fun AddExerciseDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    var exerciseName by remember { mutableStateOf("") }
+    var exerciseName by rememberSaveable { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = surfaceColor,
@@ -127,11 +143,15 @@ fun AddExerciseDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), color = textSecondary) } }
     )
 }
-
+/**
+ * Card component displaying a single exercise with its sets.
+ * Shows set number, weight and reps for each completed set.
+ * Allows adding new sets via dialog.
+ */
 @Composable
 fun ExerciseCard(exercise: com.example.gymtrack.data.db.ExerciseEntity, workoutViewModel: WorkoutViewModel) {
     val sets by workoutViewModel.getSetsForExercise(exercise.id).observeAsState(emptyList())
-    var showAddSetDialog by remember { mutableStateOf(false) }
+    var showAddSetDialog by rememberSaveable { mutableStateOf(false) }
 
     Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = surfaceColor), shape = RoundedCornerShape(12.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -167,11 +187,17 @@ fun ExerciseCard(exercise: com.example.gymtrack.data.db.ExerciseEntity, workoutV
         )
     }
 }
-
+/**
+ * Dialog for adding a new set to an exercise.
+ * Validates weight and reps input before confirming.
+ * Shows personal record notification if weight is 100kg or more.
+ */
 @Composable
 fun AddSetDialog(onDismiss: () -> Unit, onConfirm: (Float, Int) -> Unit) {
     var weight by remember { mutableStateOf("") }
     var reps by remember { mutableStateOf("") }
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = surfaceColor,
@@ -186,8 +212,19 @@ fun AddSetDialog(onDismiss: () -> Unit, onConfirm: (Float, Int) -> Unit) {
             }
         },
         confirmButton = {
-            Button(onClick = { val w = weight.toFloatOrNull(); val r = reps.toIntOrNull(); if (w != null && r != null) onConfirm(w, r) },
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor)) {
+            Button(
+                onClick = {
+                    val w = weight.toFloatOrNull()
+                    val r = reps.toIntOrNull()
+                    if (w != null && r != null) {
+                        onConfirm(w, r)
+                        if (w >= 100f) {
+                            NotificationHelper.showPersonalRecordNotification(context, "Exercise", w)
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+            ) {
                 Text(stringResource(R.string.add), color = Color.Black)
             }
         },
