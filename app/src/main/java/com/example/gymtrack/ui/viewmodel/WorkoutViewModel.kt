@@ -3,6 +3,7 @@ package com.example.gymtrack.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gymtrack.data.db.GymTrackDatabase
 import com.example.gymtrack.data.db.ExerciseEntity
@@ -10,11 +11,14 @@ import com.example.gymtrack.data.db.SetEntity
 import com.example.gymtrack.data.db.WorkoutEntity
 import com.example.gymtrack.data.repository.WorkoutRepository
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class WorkoutViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: WorkoutRepository
     val allWorkouts: LiveData<List<WorkoutEntity>>
+    private val _activeWorkoutId = MutableLiveData<Long?>(null)
+    val activeWorkoutId: LiveData<Long?> = _activeWorkoutId
 
     init {
         val db = GymTrackDatabase.getDatabase(application)
@@ -56,5 +60,22 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
 
     fun deleteSet(set: SetEntity) = viewModelScope.launch {
         repository.deleteSet(set)
+    }
+
+    fun startWorkout(name: String) = viewModelScope.launch {
+        val workout = WorkoutEntity(
+            name = name,
+            date = Date().time
+        )
+        val id = repository.insertWorkout(workout)
+        _activeWorkoutId.postValue(id)
+    }
+
+    fun finishWorkout() {
+        _activeWorkoutId.value = null
+    }
+
+    suspend fun getTotalVolume(workoutId: Long): Float? {
+        return repository.getTotalVolume(workoutId)
     }
 }
